@@ -16,7 +16,7 @@ const ExampleUI: NextPage = () => {
       <div className="flex justify-center items-center gap-20 p-10 flex-col sm:flex-row">
         <div className="card w-50 glass">
           <figure>
-            <Image src="/bayc.png" alt="car!" />
+            <Image src="/bayc.png" width={200} height={200} alt="car!" />
           </figure>
           <div className="card-body">
             <h2 className="card-title">BAYC</h2>
@@ -46,7 +46,7 @@ const ExampleUI: NextPage = () => {
         </div>
         <div className="card w-50 glass">
           <figure>
-            <Image src="/bayc.png" alt="car!" />
+            <Image src="/bayc.png" width={200} height={200} alt="car!" />
           </figure>
           <div className="card-body">
             <h2 className="card-title">BAYC</h2>
@@ -76,7 +76,7 @@ const ExampleUI: NextPage = () => {
         </div>
         <div className="card w-50 glass">
           <figure>
-            <Image src="/bayc.png" alt="car!" />
+            <Image src="/bayc.png" width={200} height={200} alt="car!" />
           </figure>
           <div className="card-body">
             <h2 className="card-title">BAYC</h2>
