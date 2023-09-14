@@ -22,8 +22,8 @@ describe("MyToken", function () {
     myToken.grantRole(myToken.MINTER_ROLE(), minter.address);
 
     // Mint some tokens to the contract owner
-    await myToken.mint(owner.address, 1, 100, [], { gasLimit: 3e7 });
-    await myToken.mint(owner.address, 2, 200, [], { gasLimit: 3e7 });
+    await myToken.mint(owner.address, 100, { gasLimit: 3e7 });
+    await myToken.mint(owner.address, 200, { gasLimit: 3e7 });
   });
 
   // Write a test to check that the contract owner can set the URI
@@ -154,14 +154,13 @@ describe("MyToken", function () {
   it("should mint multiple tokens to a recipient", async function () {
     // Mint two tokens to the recipient
     const to = addr1.address;
-    const ids = [1, 2];
     const amounts = [10, 20];
-    const data = "0x";
-    await myToken.connect(minter).mintBatch(to, ids, amounts, data);
+    await myToken.connect(minter).mintBatch(to, amounts);
+    console.log((await myToken.id()).toString());
 
     // Check that the recipient has the correct balances
-    const balance1 = await myToken.balanceOf(to, 1);
-    const balance2 = await myToken.balanceOf(to, 2);
+    const balance1 = await myToken.balanceOf(to, 3);
+    const balance2 = await myToken.balanceOf(to, 4);
     expect(balance1).to.equal(10);
     expect(balance2).to.equal(20);
   });
@@ -169,10 +168,8 @@ describe("MyToken", function () {
   it("should not allow a non-minter to mint batch tokens", async function () {
     // Try to mint a token from a non-minter address
     const to = addr1.address;
-    const ids = [1];
     const amounts = [10];
-    const data = "0x";
-    await expect(myToken.connect(addr1).mintBatch(to, ids, amounts, data)).to.be.revertedWith(
+    await expect(myToken.connect(addr1).mintBatch(to, amounts)).to.be.revertedWith(
       "AccessControl: account " + addr1.address.toLowerCase() + " is missing role " + (await myToken.MINTER_ROLE()),
     );
 
@@ -183,10 +180,8 @@ describe("MyToken", function () {
   it("should not allow a non-minter to mint btokens", async function () {
     // Try to mint a token from a non-minter address
     const to = addr1.address;
-    const id = 1;
     const amount = 10;
-    const data = "0x";
-    await expect(myToken.connect(addr1).mint(to, id, amount, data)).to.be.revertedWith(
+    await expect(myToken.connect(addr1).mint(to, amount)).to.be.revertedWith(
       "AccessControl: account " + addr1.address.toLowerCase() + " is missing role " + (await myToken.MINTER_ROLE()),
     );
 
