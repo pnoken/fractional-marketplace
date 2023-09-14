@@ -6,7 +6,7 @@ const ExampleUI: NextPage = () => {
   return (
     <>
       <MetaHeader
-        title="Example UI | Scaffold-ETH 2"
+        title="Fractionalized NFTS | Fract"
         description="Example UI created with 🏗 Scaffold-ETH 2, showcasing some of its features."
       >
         {/* We are importing the font this way to lighten the size of SE2. */}
