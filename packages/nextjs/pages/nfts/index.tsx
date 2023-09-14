@@ -47,6 +47,9 @@ const NFTMarketplace: NextPage = () => {
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree&display=swap" rel="stylesheet" />
       </MetaHeader>
+      <div className="flex-flex-end mt-4">
+        <button className="btn btn-primary">Import NFT</button>
+      </div>
       <div className="grid p-10 xl:grid-cols-5 md:grid-cols-3 grid-cols-2 gap-10">
         <Card imgSrc="/bayc.png" fractionPurchased={100} totalFractions={400} contractAddress="0x1273nb" />
         <Card imgSrc="/bayc.png" fractionPurchased={100} totalFractions={400} contractAddress="0x1273nb" />
