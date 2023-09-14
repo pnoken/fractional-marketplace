@@ -10,6 +10,7 @@ contract MyToken is ERC1155, AccessControl, Pausable, ERC1155Burnable {
     bytes32 public constant URI_SETTER_ROLE = keccak256("URI_SETTER_ROLE");
     bytes32 public constant PAUSER_ROLE = keccak256("PAUSER_ROLE");
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
+    uint256 public id = 0;
 
     constructor() ERC1155("ipfs://{id}") {
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
@@ -30,18 +31,22 @@ contract MyToken is ERC1155, AccessControl, Pausable, ERC1155Burnable {
         _unpause();
     }
 
-    function mint(address account, uint256 id, uint256 amount, bytes memory data)
+    function mint(address account, uint256 amount)
         public
         onlyRole(MINTER_ROLE)
     {
-        _mint(account, id, amount, data);
+        _mint(account, ++id, amount, "");
     }
 
-    function mintBatch(address to, uint256[] memory ids, uint256[] memory amounts, bytes memory data)
+    function mintBatch(address to, uint256[] memory amounts)
         public
         onlyRole(MINTER_ROLE)
     {
-        _mintBatch(to, ids, amounts, data);
+        uint256[] memory ids = new uint256[](amounts.length);
+        for (uint i = 0; i < ids.length; i++) {
+            ids[i] = ++id;
+        }
+        _mintBatch(to, ids, amounts, "");
     }
 
     function _beforeTokenTransfer(address operator, address from, address to, uint256[] memory ids, uint256[] memory amounts, bytes memory data)
