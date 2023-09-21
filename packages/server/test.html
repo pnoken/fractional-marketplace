@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NFT Upload</title>
+</head>
+<body>
+    <h1>Upload Your NFT</h1>
+    <form id="nftUploadForm" enctype="multipart/form-data">
+        <label for="nftId">NFT ID:</label>
+        <input type="text" id="nftId" name="nftId" required><br><br>
+
+        <label for="metadata">Metadata:</label>
+        <textarea id="metadata" name="metadata" required></textarea><br><br>
+
+        <label for="image">Select Image:</label>
+        <input type="file" id="image" name="image" accept="image/*" required><br><br>
+
+        <button type="submit">Upload NFT</button>
+    </form>
+
+    <div id="message"></div>
+
+    <script>
+        document.getElementById('nftUploadForm').addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const nftId = document.getElementById('nftId').value;
+            const metadata = JSON.parse(document.getElementById('metadata').value);
+            const imageInput = document.getElementById('image');
+
+            // Read the selected image file
+            const imageFile = imageInput.files[0];
+
+            if (!imageFile) {
+                return alert('Please select an image file.');
+            }
+
+            const formData = new FormData();
+            formData.append('nftId', nftId);
+            formData.append('metadata', JSON.stringify(metadata));
+            formData.append('image', imageFile);
+
+            try {
+                const response = await fetch('http://localhost:3042/upload-nft', {
+                    method: 'POST',
+                    body: formData,
+                });
+
+                if (response.ok) {
+                    document.getElementById('message').textContent = 'NFT uploaded successfully.';
+                } else {
+                    document.getElementById('message').textContent = 'Error uploading NFT.';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('message').textContent = 'An error occurred.';
+            }
+        });
+    </script>
+</body>
+</html>

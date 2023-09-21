@@ -38,6 +38,8 @@
   },
   "packageManager": "yarn@3.2.3",
   "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
     "nft.storage": "^7.1.1"
   }
 }

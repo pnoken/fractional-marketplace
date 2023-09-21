@@ -4,6 +4,7 @@ import { ethers } from "hardhat";
 import { expect } from "chai";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { MyToken } from "../typechain-types";
+import { parse } from "path";
 
 // Start with a describe block to group your tests
 describe("MyToken", function () {
@@ -11,19 +12,62 @@ describe("MyToken", function () {
   let myToken: MyToken;
   let owner: SignerWithAddress;
   let addr1: SignerWithAddress;
+  let addr2: SignerWithAddress;
   let minter: SignerWithAddress;
 
   // Use a beforeEach block to set up your tests
   beforeEach(async function () {
     // Deploy a new instance of the MyToken contract
-    [owner, addr1, minter] = await ethers.getSigners();
+    [owner, addr1, addr2, minter] = await ethers.getSigners();
     const MyToken = await ethers.getContractFactory("MyToken");
     myToken = await MyToken.deploy();
     myToken.grantRole(myToken.MINTER_ROLE(), minter.address);
 
     // Mint some tokens to the contract owner
-    await myToken.mint(owner.address, 100, { gasLimit: 3e7 });
-    await myToken.mint(owner.address, 200, { gasLimit: 3e7 });
+    await myToken.mint(owner.address, 100, 1);
+    await myToken.mint(owner.address, 200, 1);
+    await myToken.mint(addr2.address, 100, 1);
+  });
+
+  
+  it("should be able to buy tokens", async function () {
+    // Mint some tokens to the fromAccount
+
+
+    // Call the buyFraction function with the correct amount of funds
+    const amount = 2;
+    const id =3
+    const pricePerFraction = await myToken.getPricePerFraction(3, addr2.address);
+    const value = amount * parseInt(pricePerFraction.toString());
+    const addr1Balance = await addr1.getBalance();
+    const buy =  myToken.connect(addr1).buyFraction(amount, id, addr2.address, { value: value, gasLimit: 3e5 });
+    expect(buy).to.emit(myToken, "TransferSingle").withArgs(myToken.address, addr2.address, addr1.address, 3, amount);
+    await buy.catch(e => console.log(e));
+
+
+  });
+
+  it("should revert if not enough funds are sent", async function () {
+
+    // Call the buyFraction function with the correct amount of funds
+    const amount = 10;
+    const id =1
+    const pricePerFraction = await myToken.getPricePerFraction(3, addr2.address);
+    const value = (amount * parseInt(pricePerFraction.toString())) - 1;
+    await expect(myToken.connect(addr1).buyFraction(amount, id, addr2.address, { value: value })).to.be.revertedWith('Not enough funds sent');
+
+  });
+
+
+
+  it("should revert if not enough tokens are available", async function () {
+      
+      const amount = 1000;
+      const id =1
+      const pricePerFraction = await myToken.getPricePerFraction(3, addr2.address);
+      const value = amount * parseInt(pricePerFraction.toString());
+      await expect(myToken.connect(addr1).buyFraction(amount, id, addr2.address, { value: value })).to.be.revertedWith('ERC1155: insufficient balance for transfer');
+  
   });
 
   // Write a test to check that the contract owner can set the URI
@@ -155,12 +199,10 @@ describe("MyToken", function () {
     // Mint two tokens to the recipient
     const to = addr1.address;
     const amounts = [10, 20];
-    await myToken.connect(minter).mintBatch(to, amounts);
-    console.log((await myToken.id()).toString());
-
+    await myToken.connect(minter).mintBatch(to, amounts, 10);
     // Check that the recipient has the correct balances
-    const balance1 = await myToken.balanceOf(to, 3);
-    const balance2 = await myToken.balanceOf(to, 4);
+    const balance1 = await myToken.balanceOf(to, 4);
+    const balance2 = await myToken.balanceOf(to, 5);
     expect(balance1).to.equal(10);
     expect(balance2).to.equal(20);
   });
@@ -169,7 +211,7 @@ describe("MyToken", function () {
     // Try to mint a token from a non-minter address
     const to = addr1.address;
     const amounts = [10];
-    await expect(myToken.connect(addr1).mintBatch(to, amounts)).to.be.revertedWith(
+    await expect(myToken.connect(addr1).mintBatch(to, amounts, 10)).to.be.revertedWith(
       "AccessControl: account " + addr1.address.toLowerCase() + " is missing role " + (await myToken.MINTER_ROLE()),
     );
 
@@ -181,7 +223,7 @@ describe("MyToken", function () {
     // Try to mint a token from a non-minter address
     const to = addr1.address;
     const amount = 10;
-    await expect(myToken.connect(addr1).mint(to, amount)).to.be.revertedWith(
+    await expect(myToken.connect(addr1).mint(to, amount, 10)).to.be.revertedWith(
       "AccessControl: account " + addr1.address.toLowerCase() + " is missing role " + (await myToken.MINTER_ROLE()),
     );
 
@@ -203,4 +245,8 @@ describe("MyToken", function () {
     const supportsOther = await myToken.supportsInterface("0x12345678");
     expect(supportsOther).to.equal(false);
   });
+
+
+
+
 });
