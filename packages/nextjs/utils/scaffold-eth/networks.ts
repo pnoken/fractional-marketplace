@@ -90,7 +90,7 @@ export function getBlockExplorerTxLink(chainId: number, txnHash: string) {
  */
 export function getBlockExplorerAddressLink(network: chains.Chain, address: string) {
   const blockExplorerBaseURL = network.blockExplorers?.default?.url;
-  if (network.id === chains.hardhat.id) {
+  if (network.id === chains.polygonMumbai.id) {
     return `/blockexplorer/address/${address}`;
   }
 
